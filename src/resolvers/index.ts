@@ -45,10 +45,18 @@ export default function initResolvers({ web3 }: EthqlContext): IResolvers {
         if (!web3.utils.isAddress(input) && !input.endsWith('.eth')) {
           return undefined;
         }
-        if (input.value.endsWith('.eth')) {
-          const provider = new Web3.providers.HttpProvider(web3.currentProvider);
+        if (input.endsWith('.eth')) {
+          const provider = new Web3.providers.HttpProvider();
           const ens = new ENS(provider);
-          const address = ens.resolver('foo.eth').addr();
+          const address = ens
+            .resolver(input)
+            .addr()
+            .then(addr => {
+              console.log(addr);
+            })
+            .catch(err => {
+              console.log(err);
+            });
           return address;
         }
         return input;
@@ -58,9 +66,17 @@ export default function initResolvers({ web3 }: EthqlContext): IResolvers {
           return undefined;
         }
         if (ast.value.endsWith('.eth')) {
-          const provider = new Web3.providers.HttpProvider(web3.currentProvider);
+          const provider = new Web3.providers.HttpProvider();
           const ens = new ENS(provider);
-          const address = ens.resolver('foo.eth').addr();
+          const address = ens
+            .resolver(ast.value)
+            .addr()
+            .then(addr => {
+              console.log(addr);
+            })
+            .catch(err => {
+              console.log(err);
+            });
           return address;
         }
         return String(ast.value);
