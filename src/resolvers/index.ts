@@ -34,10 +34,21 @@ export default function initResolvers({ web3 }: EthqlContext): IResolvers {
       name: 'Address',
       description: 'An account address',
       serialize: String,
-      parseValue: input => (web3.utils.isAddress(input) ? input : undefined),
-      parseLiteral: ast => {
-        if (ast.kind !== Kind.STRING || !web3.utils.isAddress(ast.value)) {
+      parseValue: input => {
+        if (!web3.utils.isAddress(input) && !input.endsWith('.eth')) {
           return undefined;
+        }
+        if (input.value.endsWith('.eth')) {
+          return input;
+        }
+        return input;
+      },
+      parseLiteral: ast => {
+        if (ast.kind !== Kind.STRING || (!web3.utils.isAddress(ast.value) && !ast.value.endsWith('.eth'))) {
+          return undefined;
+        }
+        if (ast.value.endsWith('.eth')) {
+          return ast.value;
         }
         return String(ast.value);
       },

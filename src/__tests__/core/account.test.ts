@@ -35,6 +35,36 @@ test('account: error when address is invalid', async () => {
   expect(result.errors[0].message).toMatch(/^Expected type Address\!/);
 });
 
+test('account: select by ENS address', async () => {
+  const query = `
+    {
+      account(address: "ethereumfoundation.eth") {
+        code
+        transactionCount
+      }
+    }
+  `;
+
+  const result = await execQuery(query);
+  expect(result.data.account.code.startsWith('6060604052604051608080611')).toEqual(true);
+  expect(result.data.account.transactionCount).toEqual(1110);
+});
+
+test('account: error when ENS address is invalid', async () => {
+  const query = `
+    {
+      account(address: "alice.eth") {
+        code
+        transactionCount
+      }
+    }
+  `;
+
+  const result = await execQuery(query);
+  expect(result.errors).toHaveLength(1);
+  expect(result.errors[0].message).toMatch(/^Expected type Address\!/);
+});
+
 test('account: select account balance', async () => {
   const query = `
     {
