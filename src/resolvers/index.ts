@@ -1,7 +1,14 @@
 import { GraphQLScalarType, Kind } from 'graphql';
 import { IResolvers } from 'graphql-tools';
 import * as _ from 'lodash';
+import { HttpProvider } from 'web3/providers';
 import { EthqlContext } from '../model/EthqlContext';
+// tslint:disable-next-line
+const ENS = require('ethereum-ens');
+// tslint:disable-next-line
+const Web3 = require('web3');
+
+Web3.providers.HttpProvider.prototype.sendAsync = Web3.providers.HttpProvider.prototype.send;
 
 export default function initResolvers({ web3 }: EthqlContext): IResolvers {
   const scalarResolvers = {
@@ -39,7 +46,10 @@ export default function initResolvers({ web3 }: EthqlContext): IResolvers {
           return undefined;
         }
         if (input.value.endsWith('.eth')) {
-          return input;
+          const provider = new Web3.providers.HttpProvider(web3.currentProvider);
+          const ens = new ENS(provider);
+          const address = ens.resolver('foo.eth').addr();
+          return address;
         }
         return input;
       },
@@ -48,7 +58,10 @@ export default function initResolvers({ web3 }: EthqlContext): IResolvers {
           return undefined;
         }
         if (ast.value.endsWith('.eth')) {
-          return ast.value;
+          const provider = new Web3.providers.HttpProvider(web3.currentProvider);
+          const ens = new ENS(provider);
+          const address = ens.resolver('foo.eth').addr();
+          return address;
         }
         return String(ast.value);
       },
