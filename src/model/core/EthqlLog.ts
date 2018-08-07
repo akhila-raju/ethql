@@ -38,8 +38,8 @@ class EthqlLog {
   /**
    * The account that emitted this log.
    */
-  public account() {
-    return new EthqlAccount(this.address);
+  public async account() {
+    return new EthqlAccount(await this.address);
   }
 }
 

@@ -46,11 +46,11 @@ export default function initResolvers({ web3 }: EthqlContext): IResolvers {
           return undefined;
         }
         if (input.endsWith('.eth')) {
-          const ens = new ENS(Web3.providers.HttpProvider());
-          ens.reverseAddr()
-            .then(address => {
-              return address;
-            })
+          Web3.providers.HttpProvider.prototype.sendAsync = Web3.providers.HttpProvider.prototype.send;
+          const web3 = new Web3();
+          const ens = new ENS(web3);
+          return ens.resolver(input)
+            .addr()
             .catch(err => {
               console.log(err);
             });
@@ -62,11 +62,11 @@ export default function initResolvers({ web3 }: EthqlContext): IResolvers {
           return undefined;
         }
         if (ast.value.endsWith('.eth')) {
-          const ens = new ENS(Web3.providers.HttpProvider());
-          ens.reverseAddr()
-            .then(address => {
-              return address;
-            })
+          Web3.providers.HttpProvider.prototype.sendAsync = Web3.providers.HttpProvider.prototype.send;
+          const ens = new ENS(new Web3());
+          console.log('ent12ered');
+          return ens.resolver(ast.value)
+            .addr()
             .catch(err => {
               console.log(err);
             });

@@ -3,7 +3,7 @@ import Web3 = require('web3');
 import { Unit } from '../../types/web3/utils';
 import { testGraphql } from '../utils';
 
-const { execQuery, ctxFactory } = testGraphql();
+const { execQuery, ctxFactory, prepareContext } = testGraphql();
 
 test.skip('account: select by address', async () => {
   const query = `
@@ -35,7 +35,7 @@ test.skip('account: error when address is invalid', async () => {
   expect(result.errors[0].message).toMatch(/^Expected type Address\!/);
 });
 
-test('account: select by ENS address', async () => {
+test.skip('account: select by ENS address', async () => {
   const query = `
     {
       account(address: "ethereumfoundation.eth") {
@@ -49,6 +49,22 @@ test('account: select by ENS address', async () => {
   expect(result.data.account.code.startsWith('6060604052604051608080611')).toEqual(true);
   expect(result.data.account.transactionCount).toEqual(1110);
 });
+
+test('Address: parseValue', async () => {
+  const query = `
+    query($address: Address!) {
+      account(address: $address) {
+        address
+      }
+    }
+  `;
+
+  const expected = { data: { account: { address: '0x0000000000000000000000000000000000000001' } } };
+  const vars = { address: 'ethereumfoundation.eth' };
+  const result = await execQuery(query, prepareContext(), vars);
+  expect(result).toEqual(expected);
+});
+
 
 test('account: error when ENS address is invalid', async () => {
   const query = `
